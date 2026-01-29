@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> SVG Drawing Tool</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+        }
+
+        .top {
+            padding: 1vh;
+            background: #333;
+            color: white;
+        }
+
+        svg {
+            width: 100vw;
+            height: 90vh;
+            background: #fff;
+            border: 1px solid #ccc;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="top">
+    Color:
+    <input type="color" id="color">
+    <button onclick="undo()">Undo</button>
+</div>
+
+<svg id="svg"></svg>
+
+<script>
+    let svg = document.getElementById("svg");
+    let color = document.getElementById("color");
+
+    let draw = false;
+    let startX, startY;
+    let rect;
+    let list = [];
+
+    svg.onmousedown = function (e) {
+        draw = true;
+        startX = e.offsetX;
+        startY = e.offsetY;
+
+        rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        rect.setAttribute("x", startX);
+        rect.setAttribute("y", startY);
+        rect.setAttribute("width", 0);
+        rect.setAttribute("height", 0);
+        rect.setAttribute("fill", color.value);
+
+        svg.appendChild(rect);
+        list.push(rect);
+    };
+
+    svg.onmousemove = function (e) {
+        if (!draw) return;
+
+        rect.setAttribute("width", Math.abs(e.offsetX - startX));
+        rect.setAttribute("height", Math.abs(e.offsetY - startY));
+        rect.setAttribute("x", Math.min(startX, e.offsetX));
+        rect.setAttribute("y", Math.min(startY, e.offsetY));
+    };
+
+    svg.onmouseup = function () {
+        draw = false;
+    };
+
+    function undo() {
+        if (list.length > 0) {
+            svg.removeChild(list.pop());
+        }
+    }
+</script>
+
+</body>
+</html>
